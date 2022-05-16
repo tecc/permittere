@@ -2,6 +2,8 @@
 node_modules/
 dist/
 
+yarn.lock
+
 # Editor files
 # - IntelliJ
 .idea/
