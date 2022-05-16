@@ -42,6 +42,6 @@
         "build:esm": "tsc -p tsconfig.esm.json",
         "build:code": "run-p build:esm build:cjs",
         "build": "run-s build:clean build:code",
-        "prepack": "run-s test"
+        "prepack": "run-s build test"
     }
 }
