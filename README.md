@@ -1,6 +1,8 @@
 # permittere
 
-permittere is a simple permissions library.
+permittere is a simple permissions library. Note that this library is new and could use feature ideas.
+
+The word `permittere` comes from Latin, meaning roughly "allow", "grant", or "permit" ([see here](https://en.wiktionary.org/wiki/permitto#Latin)).
 
 ## Usage
 
