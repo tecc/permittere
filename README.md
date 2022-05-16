@@ -1,4 +1,6 @@
-# permittere
+# permittere 
+[![npm](https://img.shields.io/npm/v/permittere?label=latest&style=flat-square)](https://npmjs.com/package/permittere) 
+[![development branch](https://img.shields.io/github/package-json/v/tecc/permittere?label=development%20branch&style=flat-square)](https://github.com/tecc/permittere) 
 
 permittere is a simple permissions library. Note that this library is new and could use feature ideas.
 
