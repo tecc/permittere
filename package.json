@@ -1,0 +1,47 @@
+{
+    "name": "permittere",
+    "description": "A simple permissions library.",
+    "version": "0.1.0-alpha",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "tecc",
+        "url": "https://tecc.me"
+    },
+    "homepage": "https://docs.tecc.me/permittere",
+    "repository": "https://github.com/tecc/permittere.git",
+    "keywords": [
+        "permittere",
+        "permission",
+        "role",
+        "access",
+        "security"
+    ],
+    "devDependencies": {
+        "@types/jest": "^27.5.1",
+        "@typescript-eslint/eslint-plugin": "^5.23.0",
+        "@typescript-eslint/parser": "^5.23.0",
+        "eslint": "^8.15.0",
+        "eslint-plugin-header": "^3.1.1",
+        "eslint-plugin-tsdoc": "^0.2.16",
+        "jest": "^28.0.2",
+        "npm-run-all": "^4.1.5",
+        "prettier": "^2.6.2",
+        "rimraf": "^3.0.2",
+        "ts-jest": "^28.0.2",
+        "ts-node": "^10.7.0",
+        "typescript": "^4.6.4"
+    },
+    "scripts": {
+        "lint": "( prettier -c . || true ) && eslint .",
+        "fix-style": "( prettier -w . || true ) && eslint --fix .",
+        "test": "jest",
+        "build:clean": "rimraf dist",
+        "build:cjs": "tsc -p tsconfig.json",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "build:code": "run-p build:esm build:cjs",
+        "build": "run-s build:clean build:code",
+        "prepack": "run-s test"
+    }
+}

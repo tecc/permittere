@@ -1,0 +1,11 @@
+# Project files
+node_modules/
+dist/
+
+# Editor files
+# - IntelliJ
+.idea/
+*.iml
+# Visual Studio Code
+.vscode/
+*.code-workspace
