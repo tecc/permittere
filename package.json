@@ -1,7 +1,7 @@
 {
     "name": "permittere",
     "description": "A simple permissions library.",
-    "version": "0.1.0-alpha",
+    "version": "0.1.0-alpha.1",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
     "license": "Apache-2.0",
