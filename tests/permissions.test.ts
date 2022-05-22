@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { PermissionName, permissions } from "./generic";
+import { PermissionName, permissions } from "./github";
 import { Permissions, ManagedPermissionMap } from "permittere/permissions";
 
 const managed = new ManagedPermissionMap(permissions);

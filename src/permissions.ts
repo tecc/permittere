@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 import { isArray, isNull, PermissionError } from "./util";
+import { type ResolutionStrategy, type ConflictStrategy, type PermissionState, defaults } from "./strategies";
 
 // I'm aware this may be excessively typed, but it's there for those who want it
 
@@ -89,21 +90,81 @@ export function hasParent(permission: Permission): boolean {
 }
 
 /**
+ * Permission resolution configuration.
+ *
+ * @see ManagedPermissionMap
+ */
+export interface PermissionResolutionConfig {
+    /**
+     * The resolution strategy to use.
+     * If none is specified, it defaults to {@link defaults.resolution}
+     */
+    resolve?: ResolutionStrategy;
+    /**
+     * The conflict strategy to use.
+     * If none is specified, it defaults to {@link defaults.conflict}.
+     */
+    conflict?: ConflictStrategy;
+}
+
+/**
  * A managed permission map.
  * Essentially wraps around a {@link PermissionMap} with a few useful utilities.
  */
-export class ManagedPermissionMap<T extends PermissionMap> {
+export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
     /**
      * The underlying map.
      */
     private map: T;
+    /**
+     * The default resolution strategy for this map.
+     * @private
+     */
+    private resolve: ResolutionStrategy;
+    /**
+     * The default cnoflict strategy for this map.
+     * @private
+     */
+    private conflict: ConflictStrategy;
 
     /**
      * Create a new permission map.
-     * @param map - The underlying permission map.
+     * @param map - The underlying map
+     * @param resolutionConfig - The configuration for the map.
      */
-    constructor(map: T) {
-        this.map = Object.assign({}, map);
+    constructor(map: T, resolutionConfig: PermissionResolutionConfig = {}) {
+        this.map = Object.assign({}, map); // TODO: Copy it better
+        this.resolve = !resolutionConfig.resolve ? defaults.resolution : resolutionConfig.resolve;
+        this.conflict = !resolutionConfig.conflict ? defaults.conflict : resolutionConfig.conflict;
+    }
+
+    public getPermission(permission: Permission | string) {
+        switch (typeof permission) {
+        case "string":
+            return this.map[permission];
+        case "object":
+            return this.map[permission.name];
+        }
+    }
+
+    public resolvePermissionDirectly(permission: Permission, permissions: Permissions<T>): PermissionState {
+        const actualPermission = this.getPermission(permission);
+        if (isNull(actualPermission)) {
+            throw new PermissionError(`Permission ${permission.name} does not exist`);
+        }
+
+        const value = permissions[actualPermission.name];
+        if (isNull(value)) {
+            return {
+                permitted: permission.default,
+                explicit: false
+            };
+        }
+
+        return {
+            permitted: value,
+            explicit: true
+        };
     }
 
     /**
@@ -114,30 +175,17 @@ export class ManagedPermissionMap<T extends PermissionMap> {
      */
     public hasPermission(
         permissionName: keyof T,
-        permissions: Permissions<T>
+        permissions: Permissions<T>,
+        resolutionConfig?: PermissionResolutionConfig
     ): boolean {
-        // Get the permission and check that it's actually a permission
-        const permission = this.map[permissionName];
-        if (isNull(permission)) {
-            throw new PermissionError("Permission does not exist");
-        }
+        const resolve = !resolutionConfig?.resolve ? this.resolve : resolutionConfig?.resolve;
+        const conflict = !resolutionConfig?.conflict ? this.conflict : resolutionConfig?.conflict;
 
-        // Check if it has a direct value set
-        const directValue = permissions[permissionName];
-        if (!isNull(directValue)) {
-            // If it does, return it
-            return directValue;
-        }
-
-        // Well, it doesn't have a value set directly, so let's check
-        if (hasParent(permission)) {
-            const parents = permission.parents as string[]; // This is here because I obsess over code style
-            return parents
-                .map((s) => this.hasPermission(s, permissions))
-                .reduce((p, c) => p || c);
-        }
-
-        // noinspection PointlessBooleanExpressionJS
-        return !!permission.default; // I'm just adding this here to make sure that it is a boolean
+        // Resolution functions aren't allowed to access the permissions object directly
+        // There's not really a good reason for this, unless the resolver is malicious,
+        // in which case it could change the permissions object due to how JavaScript works
+        return resolve(this.map[permissionName], this.map, (permission) => {
+            return this.resolvePermissionDirectly(permission, permissions);
+        }, resolve, conflict).permitted;
     }
 }
