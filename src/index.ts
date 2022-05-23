@@ -19,4 +19,4 @@ export {
     PermissionMap,
     Permissions,
     PermissionDisplay
-} from "./permissions";
+} from "permittere/permissions";

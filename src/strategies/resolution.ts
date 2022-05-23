@@ -14,9 +14,9 @@
  */
 
 
-import { hasParent, Permission, PermissionMap } from "../permissions";
-import { ConflictStrategy, prefer } from "./conflict";
-import { PermissionState } from "../strategies";
+import { hasParent, Permission, PermissionMap } from "permittere/permissions";
+import { ConflictStrategy, prefer } from "permittere/strategies/conflict";
+import { PermissionState } from "permittere/strategies";
 
 export type StateResolver = (which: Permission) => PermissionState;
 export type ResolutionStrategy = (permission: Permission, map: PermissionMap, getState: StateResolver, resolve: ResolutionStrategy, conflict: ConflictStrategy) => PermissionState;

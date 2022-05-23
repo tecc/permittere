@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { isArray, isNull, PermissionError } from "./util";
-import { type ResolutionStrategy, type ConflictStrategy, type PermissionState, defaults } from "./strategies";
+import { isArray, isNull, PermissionError } from "permittere/util";
+import { type ResolutionStrategy, type ConflictStrategy, type PermissionState, defaults } from "permittere/strategies";
 
 // I'm aware this may be excessively typed, but it's there for those who want it
 

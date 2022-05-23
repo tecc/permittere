@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { type ConflictStrategy, coerceToFalse, coerceToTrue, prefer } from "./strategies/conflict";
-import { type ResolutionStrategy, direct, parentsOtherwiseChildren, explicitChildrenOverParents, explicitParentsOverChildren } from "./strategies/resolution";
+import { type ConflictStrategy, coerceToFalse, coerceToTrue, prefer } from "permittere/strategies/conflict";
+import { type ResolutionStrategy, direct, parentsOtherwiseChildren, explicitChildrenOverParents, explicitParentsOverChildren } from "permittere/strategies/resolution";
 
 export type PermissionState = {
     permitted: boolean;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { PermissionState } from "../strategies";
+import { PermissionState } from "permittere/strategies";
 
 export type ConflictStrategy = (states: PermissionState[]) => PermissionState;
 
