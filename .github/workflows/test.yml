@@ -19,5 +19,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.version }}
+      - uses: codecov/codecov-action@v3
       - run: yarn
-      - run: yarn test
+      - run: yarn test --coverage 
