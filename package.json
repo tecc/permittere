@@ -9,6 +9,16 @@
         "name": "tecc",
         "url": "https://tecc.me"
     },
+    "exports": {
+        "default": {
+            "import": {
+                "./*": "./dist/esm/*.js"
+            },
+            "require": {
+                "./*": "./dist/cjs/*.js"
+            }
+        }
+    },
     "homepage": "https://docs.tecc.me/permittere",
     "repository": "https://github.com/tecc/permittere.git",
     "keywords": [
