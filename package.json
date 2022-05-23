@@ -10,13 +10,13 @@
         "url": "https://tecc.me"
     },
     "exports": {
-        "default": {
-            "import": {
-                "./*": "./dist/esm/*.js"
-            },
-            "require": {
-                "./*": "./dist/cjs/*.js"
-            }
+        "./*": {
+            "import": [ "./dist/esm/*.js" ],
+            "require": [ "./dist/cjs/*.js" ]
+        },
+        ".": {
+            "import": [ "./dist/esm/index.js" ],
+            "require": [ "./dist/cjs/index.js" ]
         }
     },
     "homepage": "https://docs.tecc.me/permittere",
