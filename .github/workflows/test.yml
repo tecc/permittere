@@ -15,10 +15,15 @@ jobs:
       matrix:
         version: [ 12, 14, 16 ]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Node.JS
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.version }}
-      - uses: codecov/codecov-action@v3
-      - run: yarn
-      - run: yarn test --coverage 
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests 
+        run: yarn test --coverage
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v2
