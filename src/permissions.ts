@@ -14,6 +14,7 @@
  */
 import { isArray, isNull, PermissionError } from "permittere/util";
 import { type ResolutionStrategy, type ConflictStrategy, type PermissionState, defaults } from "permittere/strategies";
+import createDeepcopy from "rfdc";
 
 // I'm aware this may be excessively typed, but it's there for those who want it
 
@@ -89,10 +90,27 @@ export function hasParent(permission: Permission): boolean {
     return isArray(permission.parents) && permission.parents.length > 0;
 }
 
+export function resolvePermission<T extends PermissionMap>(permission: Permission, permissions: Permissions<T>) {
+    const value = permissions[permission.name];
+    if (isNull(value)) {
+        return {
+            permitted: permission.default,
+            explicit: false
+        };
+    }
+
+    return {
+        permitted: value,
+        explicit: true
+    };
+}
+
 /**
  * Permission resolution configuration.
  *
  * @see ManagedPermissionMap
+ * @see ManagedPermissionMap.resolvePermissionDirectly
+ * @see PermissionMapConfig
  */
 export interface PermissionResolutionConfig {
     /**
@@ -106,6 +124,39 @@ export interface PermissionResolutionConfig {
      */
     conflict?: ConflictStrategy;
 }
+
+/**
+ * Permission map configuration.
+ *
+ * @see ManagedPermissionMap
+ * @see PermissionResolutionConfig
+ */
+export interface PermissionMapConfig extends PermissionResolutionConfig {
+    /**
+     * Whether to have each permission resolution have a copy of all the permissions,
+     * rather than direct access to the permissions objects themselves.
+     * This will however slow permission resolution down due to deep-copying the underlying maps.
+     *
+     * If it's not specified, it defaults to true.
+     */
+    separateResolutionContexts?: boolean;
+
+    /**
+     * Whether to trust the resolvers to pass valid permissions to the direct resolvers.
+     * If true, {@link ManagedPermissionMap.hasPermission} will simply trust the resolver to pass existing permissions.
+     * If not, the permission map will get the permission stored in the original map before resolving the state of the map.
+     *
+     * Not particularly effective without {@link separateResolutionContexts}.
+     *
+     * If it's not specified, it defaults to false.
+     */
+    trustResolverPermissions?: boolean;
+}
+
+const deepcopy = createDeepcopy({
+    circles: false,
+    proto: true
+});
 
 /**
  * A managed permission map.
@@ -122,20 +173,28 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
      */
     private resolve: ResolutionStrategy;
     /**
-     * The default cnoflict strategy for this map.
+     * The default conflict strategy for this map.
      * @private
      */
     private conflict: ConflictStrategy;
+    /**
+     * Whether to separate the resolution contexts for this map or not.
+     * @private
+     */
+    private separateResolutionContexts: boolean;
 
     /**
      * Create a new permission map.
      * @param map - The underlying map
-     * @param resolutionConfig - The configuration for the map.
+     * @param mapConfig - The configuration for the map.
      */
-    constructor(map: T, resolutionConfig: PermissionResolutionConfig = {}) {
-        this.map = Object.assign({}, map); // TODO: Copy it better
-        this.resolve = !resolutionConfig.resolve ? defaults.resolution : resolutionConfig.resolve;
-        this.conflict = !resolutionConfig.conflict ? defaults.conflict : resolutionConfig.conflict;
+    constructor(map: T, mapConfig: PermissionMapConfig = {}) {
+        this.map = Object.freeze(deepcopy(map));
+
+        this.resolve = !mapConfig.resolve ? defaults.resolution : mapConfig.resolve;
+        this.conflict = !mapConfig.conflict ? defaults.conflict : mapConfig.conflict;
+        this.separateResolutionContexts = isNull(mapConfig.separateResolutionContexts) ? true : mapConfig.separateResolutionContexts;
+        this._resolveDirect = mapConfig.trustResolverPermissions ? resolvePermission : this.resolvePermissionDirectly.bind(this);
     }
 
     public getPermission(permission: Permission | string) {
@@ -147,30 +206,21 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
         }
     }
 
+    private _resolveDirect: (permission: Permission, permissions: Permissions<T>) => PermissionState;
     public resolvePermissionDirectly(permission: Permission, permissions: Permissions<T>): PermissionState {
         const actualPermission = this.getPermission(permission);
         if (isNull(actualPermission)) {
             throw new PermissionError(`Permission ${permission.name} does not exist`);
         }
 
-        const value = permissions[actualPermission.name];
-        if (isNull(value)) {
-            return {
-                permitted: permission.default,
-                explicit: false
-            };
-        }
-
-        return {
-            permitted: value,
-            explicit: true
-        };
+        return resolvePermission(actualPermission, permissions);
     }
 
     /**
      * Check if a {@link Permissions} object has a specific permission according to this map.
      * @param permissionName - The permission to check.
      * @param permissions - The permissions object to get states from.
+     * @param resolutionConfig - The resolution configuration to use. Defaults to the permission map's resolution configuration.
      * @returns Whether or not {@link permissions} have the specified permission ({@link permissionName}).
      */
     public hasPermission(
@@ -184,8 +234,11 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
         // Resolution functions aren't allowed to access the permissions object directly
         // There's not really a good reason for this, unless the resolver is malicious,
         // in which case it could change the permissions object due to how JavaScript works
-        return resolve(this.map[permissionName], this.map, (permission) => {
-            return this.resolvePermissionDirectly(permission, permissions);
+        // NOTE: The map itself is frozen
+        const targetMap = this.separateResolutionContexts ? Object.freeze(deepcopy(this.map)) : this.map;
+
+        return resolve(targetMap[permissionName], targetMap, (permission) => {
+            return this._resolveDirect(permission, permissions);
         }, resolve, conflict).permitted;
     }
 }
