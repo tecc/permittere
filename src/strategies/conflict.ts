@@ -23,18 +23,18 @@ export const coerceToFalse: ConflictStrategy = (states) => {
             permitted: a.permitted && b.permitted,
             explicit: a.explicit && b.explicit,
             coerced: true
-        }
+        };
     });
-}
+};
 export const coerceToTrue: ConflictStrategy = (states) => {
     return states.reduce((a, b) => {
         return {
             permitted: a.permitted || b.permitted,
             explicit: a.explicit || b.explicit, // This is just left here as a placeholder; if it's coerced explicitness is unknown
             coerced: true
-        }
+        };
     });
-}
+};
 
 export function prefer(explicit: boolean, fallback: ConflictStrategy): ConflictStrategy {
     return (states) => {
@@ -51,5 +51,5 @@ export function prefer(explicit: boolean, fallback: ConflictStrategy): ConflictS
             return fallback(matching.length !== 0 ? matching : states);
         }
         return Object.assign(matching[0]);
-    }
+    };
 }

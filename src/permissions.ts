@@ -72,12 +72,9 @@ export type Permissions<T extends PermissionMap = PermissionMap> = {
 /**
  * Resolved permissions object.
  * Acts essentially the same as a {@link Permissions} object, but all permissions have been precomputed.
- * @todo Make a resolution function
  */
-export type ResolvedPermissions<
-    T extends PermissionMap,
-    P extends Permissions<T> = Permissions<T>
-> = {
+export type ResolvedPermissions<T extends PermissionMap,
+  P extends Permissions<T> = Permissions<T>> = {
     [K in keyof T]: P[K] extends boolean ? P[K] : T[K]["default"];
 };
 
@@ -207,6 +204,7 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
     }
 
     private _resolveDirect: (permission: Permission, permissions: Permissions<T>) => PermissionState;
+
     public resolvePermissionDirectly(permission: Permission, permissions: Permissions<T>): PermissionState {
         const actualPermission = this.getPermission(permission);
         if (isNull(actualPermission)) {
@@ -224,9 +222,9 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
      * @returns Whether or not {@link permissions} have the specified permission ({@link permissionName}).
      */
     public hasPermission(
-        permissionName: keyof T,
-        permissions: Permissions<T>,
-        resolutionConfig?: PermissionResolutionConfig
+      permissionName: keyof T,
+      permissions: Permissions<T>,
+      resolutionConfig?: PermissionResolutionConfig
     ): boolean {
         const resolve = !resolutionConfig?.resolve ? this.resolve : resolutionConfig?.resolve;
         const conflict = !resolutionConfig?.conflict ? this.conflict : resolutionConfig?.conflict;
@@ -240,5 +238,13 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
         return resolve(targetMap[permissionName], targetMap, (permission) => {
             return this._resolveDirect(permission, permissions);
         }, resolve, conflict).permitted;
+    }
+
+    public resolvePermissions(permissions: Permissions<T>, resolutionConfig?: PermissionResolutionConfig): ResolvedPermissions<T> {
+        let perms: Partial<ResolvedPermissions<T>> = {};
+        for (const permission of Object.values(this.map)) {
+            perms[permission.name as keyof typeof perms] = this.hasPermission(permission.name, permissions, resolutionConfig);
+        }
+        return perms as ResolvedPermissions<T>;
     }
 }

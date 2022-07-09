@@ -17,6 +17,7 @@ import { PermissionName, permissions } from "./github";
 import { Permissions, ManagedPermissionMap } from "permittere/permissions";
 
 let ITERATIONS = 1000;
+let SKIP = 100;
 
 function _test(managed: ManagedPermissionMap, output: boolean = true) {
     const testData: Permissions<typeof permissions> = {
@@ -24,19 +25,34 @@ function _test(managed: ManagedPermissionMap, output: boolean = true) {
         [PermissionName.repository_delete]: true
     };
 
-    const it = ITERATIONS;
-    const start = process.hrtime.bigint();
-    for (let iteration = 0; iteration < it; iteration++) {
+    const it = ITERATIONS - SKIP;
+    let start = BigInt(-1);
+    for (let iteration = -SKIP; iteration < it; iteration++) {
+        if (iteration == 0) {
+            start = process.hrtime.bigint();
+        }
+
         // Iterations are good for measurements
-        expect(managed.hasPermission(PermissionName.user, testData)).toEqual(
-          permissions.user.default
-        );
+        expect(managed.hasPermission(PermissionName.user, testData))
+          .toEqual(
+            permissions.user.default
+          );
+        expect(managed.hasPermission(PermissionName.repository, testData))
+          .toEqual(
+            testData[PermissionName.repository]
+          );
         expect(
           managed.hasPermission(PermissionName.repository_delete, testData)
-        ).toEqual(testData[PermissionName.repository_delete]);
-        expect(managed.hasPermission(PermissionName.repository, testData)).toEqual(
-          testData[PermissionName.repository]
-        );
+        )
+          .toEqual(testData[PermissionName.repository_delete]);
+
+        const allResolved = managed.resolvePermissions(testData);
+        expect(allResolved)
+          .toHaveProperty(PermissionName.user, permissions.user.default);
+        expect(allResolved)
+          .toHaveProperty(PermissionName.repository_delete, testData[PermissionName.repository_delete]);
+        expect(allResolved)
+          .toHaveProperty(PermissionName.repository, testData[PermissionName.repository]);
     }
     const unit = "µs";
     const time = Number(process.hrtime.bigint() - start) / 1000;
@@ -52,7 +68,8 @@ test("Warmup (Default)", () => {
 
     _test(managed, false);
     ITERATIONS = 400;
-})
+    SKIP = 100;
+});
 
 test("Single context, trusted resolvers", () => {
     const managed = new ManagedPermissionMap(permissions, {
@@ -61,16 +78,16 @@ test("Single context, trusted resolvers", () => {
     });
 
     _test(managed);
-})
+});
 
 test("Single context, untrusted resolvers", () => {
     const managed = new ManagedPermissionMap(permissions, {
         separateResolutionContexts: false,
         trustResolverPermissions: false
-    })
+    });
 
     _test(managed);
-})
+});
 
 test("Separate contexts, trusted resolvers", () => {
     const managed = new ManagedPermissionMap(permissions, {
@@ -79,7 +96,7 @@ test("Separate contexts, trusted resolvers", () => {
     });
 
     _test(managed);
-})
+});
 
 test("Separate contexts, untrusted resolvers", () => {
     const managed = new ManagedPermissionMap(permissions, {

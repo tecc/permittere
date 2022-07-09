@@ -18,4 +18,4 @@ import { permissions } from "./simple";
 
 test("explicitParentsOverChildren", () => {
 
-})
+});

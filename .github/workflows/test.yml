@@ -23,7 +23,7 @@ jobs:
           node-version: ${{ matrix.version }}
       - name: Install dependencies
         run: yarn
-      - name: Run tests 
+      - name: Run tests
         run: yarn test --coverage
       - name: Upload coverage report
         uses: codecov/codecov-action@v2

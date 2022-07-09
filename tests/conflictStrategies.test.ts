@@ -22,13 +22,14 @@ const explicitTrue: PermissionState = { explicit: true, permitted: true };
 const implicitFalse: PermissionState = { explicit: false, permitted: false };
 const implicitTrue: PermissionState = { explicit: false, permitted: true };
 
-const all = [explicitFalse, explicitTrue, implicitFalse, implicitTrue] as const;
+const all = [ explicitFalse, explicitTrue, implicitFalse, implicitTrue ] as const;
 
 test("coerceToFalse", () => {
     for (const a of all) {
         for (const b of all) {
             let expectation = a.permitted && b.permitted;
-            expect(conflict.coerceToFalse([a, b])).toHaveProperty("permitted", expectation);
+            expect(conflict.coerceToFalse([ a, b ]))
+              .toHaveProperty("permitted", expectation);
         }
     }
 });
@@ -37,30 +38,35 @@ test("coerceToTrue", () => {
     for (const a of all) {
         for (const b of all) {
             let expectation = a.permitted || b.permitted;
-            expect(conflict.coerceToTrue([a, b])).toHaveProperty("permitted", expectation);
+            expect(conflict.coerceToTrue([ a, b ]))
+              .toHaveProperty("permitted", expectation);
         }
     }
-})
+});
 
 test("prefer(false, coerceToFalse)", () => {
     const strategy = conflict.prefer(false, conflict.coerceToFalse);
     let result;
     // These should work as coerceToFalse as they introduce a conflict
     for (const a of all) {
-        // TODO: Test with more than 2 states 
+        // TODO: Test with more than 2 states
         const reverse: PermissionState = {
             permitted: !a.permitted,
             explicit: a.explicit
-        }
+        };
 
-        for (const b of [a, reverse]) {
+        for (const b of [ a, reverse ]) {
             let expectation = a.permitted && b.permitted;
-            result = strategy([a, b]);
-            expect(result).toHaveProperty("permitted", expectation);
-            expect(result).toHaveProperty("coerced", true);
-            result = strategy([b, a]);
-            expect(result).toHaveProperty("permitted", expectation);
-            expect(result).toHaveProperty("coerced", true);
+            result = strategy([ a, b ]);
+            expect(result)
+              .toHaveProperty("permitted", expectation);
+            expect(result)
+              .toHaveProperty("coerced", true);
+            result = strategy([ b, a ]);
+            expect(result)
+              .toHaveProperty("permitted", expectation);
+            expect(result)
+              .toHaveProperty("coerced", true);
         }
     }
 
@@ -68,26 +74,29 @@ test("prefer(false, coerceToFalse)", () => {
     for (const a of all) {
         const reverse1: PermissionState = {
             explicit: !a.explicit,
-            permitted: a.permitted,
-        }
+            permitted: a.permitted
+        };
         const reverse2: PermissionState = {
             explicit: !a.explicit,
             permitted: !a.permitted
-        }
+        };
 
-        for (const b of [a, reverse1, reverse2]) {
+        for (const b of [ a, reverse1, reverse2 ]) {
             const coercionExpectation = a.explicit === b.explicit;
             const permittedExpectation = coercionExpectation ? a.permitted && b.permitted : a.explicit ? b.permitted : a.permitted;
             const explicitnessExpectation = coercionExpectation ? a.explicit : false;
 
-            result = strategy([a, b]);
-            expect(result).toHaveProperty("permitted", permittedExpectation);
-            expect(result).toHaveProperty("explicit", explicitnessExpectation);
+            result = strategy([ a, b ]);
+            expect(result)
+              .toHaveProperty("permitted", permittedExpectation);
+            expect(result)
+              .toHaveProperty("explicit", explicitnessExpectation);
             if (coercionExpectation || !isNull(result.coerced)) {
-                expect(result).toHaveProperty("coerced", coercionExpectation);
+                expect(result)
+                  .toHaveProperty("coerced", coercionExpectation);
             }
         }
     }
-})
+});
 
 // TODO: Add tests for all other conflict strategies

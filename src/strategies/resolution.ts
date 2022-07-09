@@ -31,9 +31,9 @@ const DIRECT = Symbol("Direct");
  * Always returns the child state, whether explicit or implicit.
  */
 export function direct(): ResolutionStrategy {
-    const strategy: ResolutionStrategy = (permission, map, has, resolve, conflict) => {
+    const strategy: ResolutionStrategy = (permission, map, has) => {
         return has(permission);
-    }
+    };
 
     return Object.assign(strategy, {
         [STRATEGY_TYPE]: DIRECT
@@ -57,11 +57,11 @@ export function parentsOtherwiseChildren(): ResolutionStrategy {
         } else {
             return getState(permission);
         }
-    }
+    };
 
     return Object.assign(strategy, {
         [STRATEGY_TYPE]: PARENTS_OTHERWISE_CHILDREN
-    })
+    });
 }
 
 const EXPLICIT_PARENTS_OVER_CHILDREN = Symbol("Explicit parents over children");
@@ -80,7 +80,7 @@ const EXPLICIT_PARENTS_OVER_CHILDREN = Symbol("Explicit parents over children");
  */
 export function explicitParentsOverChildren(fallback = parentsOtherwiseChildren()): ResolutionStrategy {
     const strategy: ResolutionStrategy = (child, map, has, resolve, conflict) => {
-        const preferExplicit = prefer(true, conflict)
+        const preferExplicit = prefer(true, conflict);
         // Check if the child has parents
         let childHasParent = hasParent(child);
 
@@ -100,13 +100,14 @@ export function explicitParentsOverChildren(fallback = parentsOtherwiseChildren(
 
         // parentState cannot be nullish if childHasParent is true
         return fallback(child, map, has, resolve, conflict);
-    }
+    };
 
 
     return Object.assign(strategy, {
         [STRATEGY_TYPE]: EXPLICIT_PARENTS_OVER_CHILDREN
-    })
+    });
 }
+
 const EXPLICIT_CHILDREN_OVER_PARENTS = Symbol("Explicit parents over children");
 
 /**
@@ -144,7 +145,7 @@ export function explicitChildrenOverParents(fallback: ResolutionStrategy = direc
         }
 
         return fallback(child, map, has, resolve, conflict);
-    }
+    };
 
     return Object.assign(strategy, {
         [STRATEGY_TYPE]: EXPLICIT_CHILDREN_OVER_PARENTS

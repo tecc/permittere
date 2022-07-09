@@ -29,7 +29,9 @@
     },
     "typesVersions": {
         "*": {
-            "*": ["dist/types/*"]
+            "*": [
+                "dist/types/*"
+            ]
         }
     },
     "homepage": "https://docs.tecc.me/permittere",

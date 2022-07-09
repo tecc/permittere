@@ -2,9 +2,15 @@
     "extends": "tsconfig.json",
     "compilerOptions": {
         "paths": {
-            "permittere": ["./src"],
-            "permittere/*": ["./src/*"]
+            "permittere": [
+                "./src"
+            ],
+            "permittere/*": [
+                "./src/*"
+            ]
         }
     },
-    "include": ["./tests/**/*"]
+    "include": [
+        "./tests/**/*"
+    ]
 }

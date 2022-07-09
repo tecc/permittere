@@ -14,7 +14,13 @@
  */
 
 import { type ConflictStrategy, coerceToFalse, coerceToTrue, prefer } from "permittere/strategies/conflict";
-import { type ResolutionStrategy, direct, parentsOtherwiseChildren, explicitChildrenOverParents, explicitParentsOverChildren } from "permittere/strategies/resolution";
+import {
+    type ResolutionStrategy,
+    direct,
+    parentsOtherwiseChildren,
+    explicitChildrenOverParents,
+    explicitParentsOverChildren
+} from "permittere/strategies/resolution";
 
 export type PermissionState = {
     permitted: boolean;
@@ -31,4 +37,10 @@ export const defaults: {
 };
 
 export { ConflictStrategy, coerceToFalse, coerceToTrue, prefer };
-export { ResolutionStrategy, direct, parentsOtherwiseChildren, explicitChildrenOverParents, explicitParentsOverChildren }
+export {
+    ResolutionStrategy,
+    direct,
+    parentsOtherwiseChildren,
+    explicitChildrenOverParents,
+    explicitParentsOverChildren
+};

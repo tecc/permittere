@@ -1,6 +1,6 @@
 # permittere 
-[![npm](https://img.shields.io/npm/v/permittere?label=latest&style=flat-square)](https://npmjs.com/package/permittere) 
-[![development branch](https://img.shields.io/github/package-json/v/tecc/permittere?label=development%20branch&style=flat-square)](https://github.com/tecc/permittere) 
+[![npm](https://img.shields.io/npm/v/permittere?label=latest&style=flat-square)](https://npmjs.com/package/permittere)
+[![development branch](https://img.shields.io/github/package-json/v/tecc/permittere?label=development%20branch&style=flat-square)](https://github.com/tecc/permittere)
 [![code coverage](https://img.shields.io/codecov/c/gh/tecc/permittere?style=flat-square)](https://github.com/tecc/permittere)
 [![tests](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftecc%2Fpermittere%2Fbadge%3Fref%3Ddev&style=flat-square)](https://github.com/tecc/permittere/commits/dev)
 
@@ -17,15 +17,15 @@ There's this example, but for the details you'll have to skim the code (there is
 const { ManagedPermissionMap } = require("permittere");
 
 const map = new ManagedPermissionMap({
-    'myParentPermission': {
-        name: 'myParentPermission', // I know that that is slightly redundant but that's fine for now
-        default: true
-    },
-    'myChildPermission': {
-        name: 'myChildPermission',
-        default: false,
-        parents: ['myParentPermission'] // Because this has a parent permission, the value of this permission will only matter if it was set directly (i.e. the entity explicitly has this permission)
-    }
+  'myParentPermission': {
+    name: 'myParentPermission', // I know that that is slightly redundant but that's fine for now
+    default: true
+  },
+  'myChildPermission': {
+    name: 'myChildPermission',
+    default: false,
+    parents: [ 'myParentPermission' ] // Because this has a parent permission, the value of this permission will only matter if it was set directly (i.e. the entity explicitly has this permission)
+  }
 });
 
 /* Some examples with this map */
