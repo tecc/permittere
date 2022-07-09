@@ -27,6 +27,11 @@
             ]
         }
     },
+    "typesVersions": {
+        "*": {
+            "*": ["dist/types/*"]
+        }
+    },
     "homepage": "https://docs.tecc.me/permittere",
     "repository": "https://github.com/tecc/permittere.git",
     "keywords": [
@@ -58,7 +63,8 @@
         "build:clean": "rimraf dist",
         "build:cjs": "tsc -p tsconfig.json",
         "build:esm": "tsc -p tsconfig.esm.json",
-        "build:code": "run-p build:esm build:cjs",
+        "build:types": "tsc -p tsconfig.types.json",
+        "build:code": "run-p build:esm build:cjs build:types",
         "build": "run-s build:clean build:code",
         "prepack": "run-s build test"
     }
