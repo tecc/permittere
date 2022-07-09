@@ -191,7 +191,8 @@ export class ManagedPermissionMap<T extends PermissionMap = PermissionMap> {
         this.resolve = !mapConfig.resolve ? defaults.resolution : mapConfig.resolve;
         this.conflict = !mapConfig.conflict ? defaults.conflict : mapConfig.conflict;
         this.separateResolutionContexts = isNull(mapConfig.separateResolutionContexts) ? true : mapConfig.separateResolutionContexts;
-        this._resolveDirect = mapConfig.trustResolverPermissions ? resolvePermission : this.resolvePermissionDirectly.bind(this);
+        const trustResolverPermissions = isNull(mapConfig.trustResolverPermissions) ? false : mapConfig.trustResolverPermissions;
+        this._resolveDirect = trustResolverPermissions ? resolvePermission : this.resolvePermissionDirectly.bind(this);
     }
 
     public getPermission(permission: Permission | string) {
