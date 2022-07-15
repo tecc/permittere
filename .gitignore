@@ -1,6 +1,7 @@
 # Project files
 node_modules/
-dist/
+# dist/ 
+# no longer ignoring dist since it's easier to use bleeding-edge this way
 
 yarn.lock
 
