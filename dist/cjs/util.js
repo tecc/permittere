@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isArray = exports.isNull = exports.PermissionError = void 0;
+exports.isString = exports.isArray = exports.isNull = exports.PermissionError = void 0;
 /**
  * Permission error. Generic, standard, boring.
  */
@@ -46,4 +46,13 @@ function isArray(value) {
     return !isNull(value) && Array.isArray(value);
 }
 exports.isArray = isArray;
+/**
+ * Checks if a value is a string.
+ * @param value - The value to check.
+ * @returns Whether the value is a string or not.
+ */
+function isString(value) {
+    return typeof value === 'string';
+}
+exports.isString = isString;
 //# sourceMappingURL=util.js.map

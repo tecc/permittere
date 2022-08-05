@@ -20,3 +20,9 @@ export declare function isNull(value: unknown): value is null | undefined;
  * @returns Whether the value is an array or not.
  */
 export declare function isArray(value: unknown): value is Array<unknown>;
+/**
+ * Checks if a value is a string.
+ * @param value - The value to check.
+ * @returns Whether the value is a string or not.
+ */
+export declare function isString(value: unknown): value is string;

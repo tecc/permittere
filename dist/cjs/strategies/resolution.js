@@ -44,7 +44,7 @@ const PARENTS_OTHERWISE_CHILDREN = Symbol("Parents otherwise children");
 function parentsOtherwiseChildren() {
     const strategy = (permission, map, getState, resolve, conflict) => {
         if ((0, permissions_1.hasParent)(permission)) {
-            const parents = permission.parents;
+            const parents = (0, permissions_1.getParents)(permission);
             return conflict(parents.map((parent) => resolve(map[parent], map, getState, resolve, conflict)));
         }
         else {
@@ -75,7 +75,7 @@ function explicitParentsOverChildren(fallback = parentsOtherwiseChildren()) {
         // Check if the child has parents
         let childHasParent = (0, permissions_1.hasParent)(child);
         if (childHasParent) {
-            const parents = child.parents;
+            const parents = (0, permissions_1.getParents)(child);
             const parentState = preferExplicit(parents.map((v) => resolve(map[v], map, has, resolve, conflict)));
             if (parentState.explicit) {
                 return parentState;
@@ -116,7 +116,7 @@ function explicitChildrenOverParents(fallback = direct()) {
         }
         const childHasParent = (0, permissions_1.hasParent)(child);
         if (childHasParent) {
-            const parents = child.parents;
+            const parents = (0, permissions_1.getParents)(child);
             const parentState = preferExplicit(parents.map((parent) => resolve(map[parent], map, has, resolve, conflict)));
             if (parentState.explicit) {
                 return parentState;

@@ -18,8 +18,15 @@ export interface Permission<T = string> {
      */
     name: T;
     /**
+     * The parent permission of the permission.
+     * Optional: no value and undefined are treated as having no parent.
+     * @see #parents
+     */
+    parent?: string | undefined;
+    /**
      * The parent permissions of the permission.
      * Optional: no value, undefined, and an empty array are treated as having no parent.
+     * @see #parent
      */
     parents?: string[] | undefined;
     /**
@@ -57,6 +64,7 @@ export declare type ResolvedPermissions<T extends PermissionMap, P extends Permi
  * @returns Whether or not the permission has any parents.
  */
 export declare function hasParent(permission: Permission): boolean;
+export declare function getParents(permission: Permission): string[];
 export declare function resolvePermission<T extends PermissionMap>(permission: Permission, permissions: Permissions<T>): {
     permitted: boolean;
     explicit: boolean;

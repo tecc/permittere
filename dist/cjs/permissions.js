@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ManagedPermissionMap = exports.resolvePermission = exports.hasParent = void 0;
+exports.ManagedPermissionMap = exports.resolvePermission = exports.getParents = exports.hasParent = void 0;
 /*
  * Copyright 2022 tecc
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,25 @@ const rfdc_1 = __importDefault(require("rfdc"));
  * @returns Whether or not the permission has any parents.
  */
 function hasParent(permission) {
+    if (!(0, util_1.isNull)(permission.parent)) {
+        return true;
+    }
     return (0, util_1.isArray)(permission.parents) && permission.parents.length > 0;
 }
 exports.hasParent = hasParent;
+function getParents(permission) {
+    if (!hasParent(permission))
+        return [];
+    const sum = [];
+    if ((0, util_1.isString)(permission.parent)) {
+        sum.push(permission.parent);
+    }
+    if ((0, util_1.isArray)(permission.parents) && permission.parents.length > 0) {
+        sum.push(...permission.parents);
+    }
+    return sum;
+}
+exports.getParents = getParents;
 function resolvePermission(permission, permissions) {
     const value = permissions[permission.name];
     if ((0, util_1.isNull)(value)) {

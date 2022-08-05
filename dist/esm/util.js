@@ -40,4 +40,12 @@ export function isNull(value) {
 export function isArray(value) {
     return !isNull(value) && Array.isArray(value);
 }
+/**
+ * Checks if a value is a string.
+ * @param value - The value to check.
+ * @returns Whether the value is a string or not.
+ */
+export function isString(value) {
+    return typeof value === 'string';
+}
 //# sourceMappingURL=util.js.map

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { isArray, isNull, PermissionError } from "permittere/util";
+import { isArray, isNull, isString, PermissionError } from "permittere/util";
 import { defaults } from "permittere/strategies";
 import createDeepcopy from "rfdc";
 /**
@@ -21,7 +21,22 @@ import createDeepcopy from "rfdc";
  * @returns Whether or not the permission has any parents.
  */
 export function hasParent(permission) {
+    if (!isNull(permission.parent)) {
+        return true;
+    }
     return isArray(permission.parents) && permission.parents.length > 0;
+}
+export function getParents(permission) {
+    if (!hasParent(permission))
+        return [];
+    const sum = [];
+    if (isString(permission.parent)) {
+        sum.push(permission.parent);
+    }
+    if (isArray(permission.parents) && permission.parents.length > 0) {
+        sum.push(...permission.parents);
+    }
+    return sum;
 }
 export function resolvePermission(permission, permissions) {
     const value = permissions[permission.name];

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { hasParent } from "permittere/permissions";
+import { getParents, hasParent } from "permittere/permissions";
 import { prefer } from "permittere/strategies/conflict";
 const STRATEGY_TYPE = Symbol("Resolution strategy type");
 const DIRECT = Symbol("Direct");
@@ -40,7 +40,7 @@ const PARENTS_OTHERWISE_CHILDREN = Symbol("Parents otherwise children");
 export function parentsOtherwiseChildren() {
     const strategy = (permission, map, getState, resolve, conflict) => {
         if (hasParent(permission)) {
-            const parents = permission.parents;
+            const parents = getParents(permission);
             return conflict(parents.map((parent) => resolve(map[parent], map, getState, resolve, conflict)));
         }
         else {
@@ -70,7 +70,7 @@ export function explicitParentsOverChildren(fallback = parentsOtherwiseChildren(
         // Check if the child has parents
         let childHasParent = hasParent(child);
         if (childHasParent) {
-            const parents = child.parents;
+            const parents = getParents(child);
             const parentState = preferExplicit(parents.map((v) => resolve(map[v], map, has, resolve, conflict)));
             if (parentState.explicit) {
                 return parentState;
@@ -110,7 +110,7 @@ export function explicitChildrenOverParents(fallback = direct()) {
         }
         const childHasParent = hasParent(child);
         if (childHasParent) {
-            const parents = child.parents;
+            const parents = getParents(child);
             const parentState = preferExplicit(parents.map((parent) => resolve(map[parent], map, has, resolve, conflict)));
             if (parentState.explicit) {
                 return parentState;
