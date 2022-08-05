@@ -43,3 +43,12 @@ export function isNull(value: unknown): value is null | undefined {
 export function isArray(value: unknown): value is Array<unknown> {
     return !isNull(value) && Array.isArray(value);
 }
+
+/**
+ * Checks if a value is a string.
+ * @param value - The value to check.
+ * @returns Whether the value is a string or not.
+ */
+export function isString(value: unknown): value is string {
+    return typeof value === 'string';
+}

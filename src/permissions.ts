@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { isArray, isNull, PermissionError } from "permittere/util";
+import { isArray, isNull, isString, PermissionError } from "permittere/util";
 import { type ResolutionStrategy, type ConflictStrategy, type PermissionState, defaults } from "permittere/strategies";
 import createDeepcopy from "rfdc";
 
@@ -37,9 +37,17 @@ export interface Permission<T = string> {
      * The name (or ID) of the permission.
      */
     name: T;
+
+    /**
+     * The parent permission of the permission.
+     * Optional: no value and undefined are treated as having no parent.
+     * @see #parents
+     */
+    parent?: string | undefined;
     /**
      * The parent permissions of the permission.
      * Optional: no value, undefined, and an empty array are treated as having no parent.
+     * @see #parent
      */
     parents?: string[] | undefined;
 
@@ -84,7 +92,25 @@ export type ResolvedPermissions<T extends PermissionMap,
  * @returns Whether or not the permission has any parents.
  */
 export function hasParent(permission: Permission): boolean {
+    if (!isNull(permission.parent)) {
+        return true;
+    }
     return isArray(permission.parents) && permission.parents.length > 0;
+}
+
+export function getParents(permission: Permission): string[] {
+    if (!hasParent(permission)) return [];
+
+    const sum: string[] = [];
+    if (isString(permission.parent)) {
+        sum.push(permission.parent);
+    }
+
+    if (isArray(permission.parents) && permission.parents.length > 0) {
+        sum.push(...permission.parents);
+    }
+
+    return sum;
 }
 
 export function resolvePermission<T extends PermissionMap>(permission: Permission, permissions: Permissions<T>) {
